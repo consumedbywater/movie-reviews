@@ -5,69 +5,63 @@
 genreArray = []
 
 $(document).on "turbolinks:load", ->
-    #Grab initial list of movies from server
     $('#genre-select').hide()
     $.ajax(url: 'https://api.themoviedb.org/3/genre/movie/list?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US').done (genres) ->
         genreArray = genres.genres
         for genre in genreArray
             $('#genre-select').append('<option value="' + genre.id + '">' + genre.name + '</option>')
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1').done (movies) ->
-            #Throw the movies in an array
             movieArray = movies.results
-            insertMovies(movieArray)
-            enableButtons()
-            $('#popularity-button').addClass('disabled')
+            insertMovies movieArray, ->
+                enableButtons()
+                $('#popularity-button').addClass('disabled')
 
     $('#title-button').on 'click', ->
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=original_title.desc&include_adult=false&include_video=false&page=1').done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
-            #Throw the movies in an array
             movieArray = movies.results
-            insertMovies(movieArray)
-            enableButtons()
-            $('#title-button').addClass('disabled')
+            disableButtons()
+            insertMovies movieArray, ->
+                enableButtons()
+                $('#title-button').addClass('disabled')
 
     $('#release-button').on 'click', ->
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=release_date.desc&include_adult=false&include_video=false&page=1').done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
-            #Throw the movies in an array
             movieArray = movies.results
-            insertMovies(movieArray)
-            enableButtons()
-            $('#release-button').addClass('disabled')
+            insertMovies movieArray, ->
+                enableButtons()
+                $('#release-button').addClass('disabled')
 
     $('#genre-button').on 'click', ->
         genreNum = $('#genre-select').val()
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=' + genreNum).done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
-            #Throw the movies in an array
             movieArray = movies.results
-            insertMovies(movieArray)
-            enableButtons()
-            $('#genre-button').addClass('disabled')
-            $('#genre-select').show()
+            insertMovies movieArray, ->
+                enableButtons()
+                $('#genre-button').addClass('disabled')
+                $('#genre-select').show()
 
     $('#popularity-button').on 'click', ->
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1').done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
-            #Throw the movies in an array
             movieArray = movies.results
-            insertMovies(movieArray)
-            enableButtons()
-            $('#popularity-button').addClass('disabled')
+            insertMovies movieArray, ->
+                enableButtons()
+                $('#popularity-button').addClass('disabled')
 
     $('#genre-select').on 'change', ->
         genreNum = $('#genre-select').val()
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=' + genreNum).done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
-            #Throw the movies in an array
             movieArray = movies.results
-            insertMovies(movieArray)
+            insertMovies movieArray, ->
 
 enableButtons = ->
     $('#title-button').removeClass('disabled')
@@ -76,17 +70,14 @@ enableButtons = ->
     $('#popularity-button').removeClass('disabled')
     $('#genre-select').hide();
 
-insertMovies =(movieArray) ->
+insertMovies =(movieArray, cb) ->
     for movie in movieArray
-        #console.log(movie.title, movie.id, movie.poster_path, movie.genre_ids, movie.release_date)
-        #Add each movie to page
         insertMovie(movie.title, movie.id, movie.poster_path, movie.genre_ids, movie.release_date)
         insertRating(movie.id)
-        insertReviews(movie.id)
+        insertReviews(movie.id, cb)
 
 insertRating =(id) ->
     $.ajax(url: '/movies/' + id + '/rating').done (rating) ->
-        #rating = 2
         for i in [1..5]
             if rating >= i
                 $('#rating-id-' + id).append('<img src="/assets/star-filled-7320ff66de798d37e18a026145a6975e61dc547f79df018dc31f42df25d36da4.png" alt="Star filled" width="30" height="30" />')
@@ -108,14 +99,12 @@ generateComment =(comment) ->
     else
         return ''
 
-insertReviews =(id) ->
+insertReviews =(id, cb) ->
     $.ajax(url: '/movies/' + id + '/reviews').done (reviews) ->
         reviewArray = reviews.reviews
 
 
         for review in reviewArray      
-            #reviewObject = JSON.parse(review)
-            #console.log(review)
             $('#review-section-' + id).before(
                 '<div class="row">' +
                     '<div class="col-4">' +
@@ -128,6 +117,7 @@ insertReviews =(id) ->
                         '</p>' +
                     '</div>' +
                 '</div>')
+        cb()
 
 insertMovie =(title, id, poster, genres, release) ->
     html = '<div class="card text-white bg-secondary mt-2">' +

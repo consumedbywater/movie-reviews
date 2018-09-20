@@ -1,11 +1,9 @@
 class ReviewsController < ApplicationController
   def index
-    #send a list of recent reviews
     @reviews = Review.limit(20).order(:created_at)
   end
 
   def new
-    #expect parameter movie
     @movie_id = params[:movie_id]
     @movie_title = params[:movie_title]
     @review = Review.new

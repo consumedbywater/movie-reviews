@@ -5,12 +5,6 @@ Rails.application.routes.draw do
 
   get 'home/about'
 
-  get 'home/movies'
-
-  get 'home/movie'
-
-  get 'home/genres'
-
   get 'movies/:id/rating', to: 'movies#rating'
 
   get 'movies/:id/reviews', to: 'movies#reviews'
@@ -20,5 +14,4 @@ Rails.application.routes.draw do
   resources :movies, only: [:index, :show]
   
   resources :reviews, only: [:index, :create]
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
