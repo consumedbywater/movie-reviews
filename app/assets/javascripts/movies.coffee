@@ -3,51 +3,185 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
 genreArray = []
+currentPage = 0
+totalPages = 0
+search = ""
 
 $(document).on "turbolinks:load", ->
-    movieId = $('#movie-show-id').attr('movie')
-    $.ajax(url: 'https://api.themoviedb.org/3/movie/' + movieId + '?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US').done (movie) ->
-        insertMovieShowPage movie, ->
+    hideNavigation()
+    $.ajax(url: 'https://api.themoviedb.org/3/genre/movie/list?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US').done (genres) ->
+        genreArray = genres.genres
 
-insertMovieShowPage =(movie, cb) ->
-    console.log(movie)
-    insertMovieWithGenreNames(movie.title, movie.id, movie.poster_path, movie.genres, movie.release_date)
-    insertRatingShowPage(movie.id)
+    $('#search-button').on 'click', ->
+        clearMovies()
+        search = encodeURI($('#search-field').val())
+        currentPage = 1
+        $.ajax(url: 'https://api.themoviedb.org/3/search/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&query=' + search + '&page=' + currentPage + '&include_adult=false').done (movies) ->
+            totalPages = if 1000 < movies.total_pages then 1000 else movies.total_pages
+            movieArray = movies.results
+            showNavigation()
+            insertMoviesSearch movieArray, ->
+                setButtons()
+
+    $('#first-button').on 'click', ->
+        currentPage = 1
+        clearMovies()
+        $.ajax(url: 'https://api.themoviedb.org/3/search/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&query=' + search + '&page=' + currentPage + '&include_adult=false').done (movies) ->
+            totalPages = if 1000 < movies.total_pages then 1000 else movies.total_pages
+            movieArray = movies.results
+            insertMoviesSearch movieArray, ->
+                setButtons()
+
+    $('#previous-button').on 'click', ->
+        if currentPage > 1
+            clearMovies()
+            currentPage = currentPage - 1
+            $.ajax(url: 'https://api.themoviedb.org/3/search/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&query=' + search + '&page=' + currentPage + '&include_adult=false').done (movies) ->
+                totalPages = if 1000 < movies.total_pages then 1000 else movies.total_pages
+                movieArray = movies.results
+                insertMoviesSearch movieArray, ->
+                    setButtons()
+
+    $('#next-button').on 'click', ->
+        if currentPage < totalPages
+            clearMovies()
+            currentPage = currentPage + 1
+            $.ajax(url: 'https://api.themoviedb.org/3/search/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&query=' + search + '&page=' + currentPage + '&include_adult=false').done (movies) ->
+                totalPages = if 1000 < movies.total_pages then 1000 else movies.total_pages
+                movieArray = movies.results
+                insertMoviesSearch movieArray, ->
+                    setButtons()
+
+
+    $('#last-button').on 'click', ->
+        currentPage = totalPages
+        clearMovies()
+        $.ajax(url: 'https://api.themoviedb.org/3/search/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&query=' + search + '&page=' + currentPage + '&include_adult=false').done (movies) ->
+            totalPages = if 1000 < movies.total_pages then 1000 else movies.total_pages
+            movieArray = movies.results
+            insertMoviesSearch movieArray, ->
+                setButtons()
+
+clearMovies = ->
+    $('#search-results').empty()
+
+showNavigation = ->
+    $('#first-button').show()
+    $('#previous-button').show()
+    $('#current-page').show()
+    $('#next-button').show()
+    $('#last-button').show()
+
+hideNavigation = ->
+    $('#first-button').hide()
+    $('#previous-button').hide()
+    $('#current-page').hide()
+    $('#next-button').hide()
+    $('#last-button').hide()
+
+incrementPage = ->
+    $('#current-page').text(parseInt($('#current-page').text()) + 1)
+
     
-insertRatingShowPage =(id) ->
+decrementPage = ->
+    $('#current-page').text(parseInt($('#current-page').text()) - 1)
+
+setButtons = ->
+    if (currentPage <= 1)
+        $('#first-button').addClass('disabled')
+        $('#previous-button').addClass('disabled')
+    else
+        $('#first-button').removeClass('disabled')
+        $('#previous-button').removeClass('disabled')
+
+    if (totalPages <= currentPage)
+        $('#next-button').addClass('disabled')
+        $('#last-button').addClass('disabled')
+    else
+        $('#next-button').removeClass('disabled')
+        $('#last-button').removeClass('disabled')
+    $('#current-page').text(currentPage)
+
+insertMoviesSearch =(movieArray, cb) ->
+    for movie in movieArray
+        insertMovieSearch(movie.title, movie.id, movie.poster_path, movie.genre_ids, movie.release_date)
+        insertRatingSearch(movie.id)
+        insertReviewsSearch(movie.id, cb)
+
+insertRatingSearch =(id) ->
     $.ajax(url: '/movies/' + id + '/rating').done (rating) ->
         for i in [1..5]
             if rating >= i
-                $('#rating-show-id-' + id).append('<img src="/assets/star-filled-white-91ffa089f753e699bbcabe2ae0fe37efc2e352e927574fc76a4d1f8586b2b077.png" alt="Star filled white" width="30" height="30" />')
+                $('#rating-search-id-' + id).append('<img src="/assets/star-filled-7320ff66de798d37e18a026145a6975e61dc547f79df018dc31f42df25d36da4.png" alt="Star filled" width="30" height="30" />')
             else
-                $('#rating-show-id-' + id).append('<img src="/assets/star-empty-white-4cdeb573705d48549b6549c448328e1284a2babd58b83f7df28ca72275a2123e.png" alt="Star empty white" width="30" height="30" />')
+                $('#rating-search-id-' + id).append('<img src="/assets/star-empty-e9301878ad41c600f8959fa49c8a9b7e1b37a7df7fa0e0253b71a36bc57faceb.png" alt="Star empty" width="30" height="30" />')
 
-insertMovieWithGenreNames =(title, id, poster, genres, release) ->
-    html = '<div class="card text-white bg-dark mt-2">' +
+generateRatingSearch =(rating) ->
+    ratingString = ""
+    for i in [1..5]
+        if rating >= i
+            ratingString = ratingString + '<img src="/assets/star-filled-7320ff66de798d37e18a026145a6975e61dc547f79df018dc31f42df25d36da4.png" alt="Star filled" width="20" height="20" />'
+        else
+            ratingString = ratingString + '<img src="/assets/star-empty-e9301878ad41c600f8959fa49c8a9b7e1b37a7df7fa0e0253b71a36bc57faceb.png" alt="Star empty" width="20" height="20" />'
+    return ratingString
+
+generateCommentSearch =(comment) ->
+    if comment.length > 0
+        return '"' + comment + '" - '
+    else
+        return ''
+
+insertReviewsSearch =(id, cb) ->
+    $.ajax(url: '/movies/' + id + '/reviews').done (reviews) ->
+        reviewArray = reviews.reviews
+
+
+        for review in reviewArray      
+            $('#review-search-section-' + id).before(
+                '<div class="row">' +
+                    '<div class="col-4">' +
+                        generateRatingSearch(review.rating) +
+                    '</div>' +
+                    '<div class="col-8">' +
+                        '<p class="card-text mb-3">' +
+                        generateCommentSearch(review.comment) +
+                        review.email + 
+                        '</p>' +
+                    '</div>' +
+                '</div>')
+        cb()
+
+insertMovieSearch =(title, id, poster, genres, release) ->
+    html = '<div class="card text-white bg-secondary mt-2">' +
              '<div class="row">' +
-                 '<div class="col-2"></div>' +
-                 '<div class="col-4 py-4">' +
-                     '<img src="https://image.tmdb.org/t/p/w200' + poster + '" width="165"/>' +
-                 '</div>' +
                  '<div class="col-4">' +
+                     '<img src="https://image.tmdb.org/t/p/w200' + poster + '" width="165" class="pl-3 pt-3" />' +
+                     '<br />' +
+                     '<div class="pl-3 pb-3" id="rating-search-id-' + id + '"></div>' +
+                 '</div>' +
+                 '<div class="col-8">' +
                      '<div class="card-body">' +
-                         '<h4>' + title + '</h4>' +
-                         
-                     '<div class="pb-3" id="rating-show-id-' + id + '"></div>' +
+                         '<a class="h4 text-white" href="/movies/' + id + '">' + title + '</a>' +
                         '<p class="card-text">' +
                         'Release date: ' + release  + 
                         '<br />' +
-                        'Genres: ' + createGenreListWithNames(genres) +
+                        'Genres: ' + createGenreListSearch(genres) +
                         '</p>' +
-                        '<a class="text-white" href="/movies/' + id + '/' + title + '/reviews/new">Write A Review</a>' +
+                        '<div id="review-search-section-' + id + '"></div>' +
+                        '<div class="row">' +
+                            '<a class="text-white mr-3" href="/movies/' + id + '">View More Reviews</a>' +
+                            '<a class="text-white" href="/movies/' + id + '/' + title + '/reviews/new">Write A Review</a>' +
+                        '</div>' +
                     '</div>' +
                 '</div>' +
             '</div>' +
         '</div>'
-    $('#movie-show-id').append(html)
+    $('#search-results').append(html)
 
-createGenreListWithNames =(genres) ->
+createGenreListSearch =(genres) ->
     genreList = ""
-    for genre in genres
-        genreList = genreList + genre.name + ' | '
+    for genreId in genres
+        for genre in genreArray
+            if genreId == genre.id
+                genreList = genreList + genre.name + ' | '
     return genreList
