@@ -5,12 +5,7 @@
 genreArray = []
 
 $(document).on "turbolinks:load", ->
-    # $.ajax(url: 'https://api.themoviedb.org/3/genre/movie/list?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US').done (genres) ->
-    #     genreArray = genres.genres
-    #     for genre in genreArray
-    #         $('#genre-select').append('<option value="' + genre.id + '">' + genre.name + '</option>')
     movieId = $('#movie-show-id').attr('movie')
-        #console.log('movieid: "' + movieId + '"')
     $.ajax(url: 'https://api.themoviedb.org/3/movie/' + movieId + '?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US').done (movie) ->
         insertMovieShowPage movie, ->
 
