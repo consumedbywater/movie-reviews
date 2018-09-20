@@ -1,1 +1,3 @@
-<%= @movie_id %>
+<div id="movie-show-id" movie=<%= @movie_id%>></div>
+
+<%= render partial: "review", collection: @reviews %>

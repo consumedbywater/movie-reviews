@@ -1,6 +1,6 @@
 class ReviewsController < ApplicationController
   def index
-    @reviews = Review.limit(20).order(:created_at)
+    @reviews = Review.order('created_at desc')
   end
 
   def new

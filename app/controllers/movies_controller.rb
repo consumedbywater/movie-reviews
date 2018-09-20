@@ -1,11 +1,10 @@
 class MoviesController < ApplicationController
   def index
-    @reviews = Review.all
   end
 
   def show
     @movie_id = params[:id]
-    @reviews = Review.where(:movie_id => @movie_id)
+    @reviews = Review.where(:movie_id => @movie_id).order('created_at desc')
   end
 
   def rating

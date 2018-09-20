@@ -1,0 +1,26 @@
+<div class="card text-white bg-secondary mt-3 mx-4 px-4">
+    <div class="card-body">
+        <div class="row">
+            <%= link_to review.movie_title, movie_path(:id => review.movie_id), class: "mx-auto h2 text-white" %>
+        </div>
+        <p class="card-text">
+            <div class="row align-items-center justify-content-center">
+                    <% (1..5).each do |i| %>
+                        <% if review.rating >= i %>
+                            <%= image_tag "star-filled.png", size: '30x30', class: "m-0 p-0 mb-3" %>
+                        <% else %>
+                            <%= image_tag "star-empty.png", size: '30x30', class: "m-0 p-0 mb-3" %>
+                        <% end %>
+                    <% end %>
+            </div>
+            <div class="row align-items-center justify-content-center">
+                    <p class="card-text mb-3">
+                        <% if review.comment != '' and review.comment != nil %>
+                            "<%= review.comment %>" -
+                        <% end %>
+                        <%= review.email %>
+                    </p>
+            </div>
+        </p>
+    </div>
+</div>
