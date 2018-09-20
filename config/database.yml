@@ -5,10 +5,6 @@ default: &default
 
 development:
   <<: *default
-  database: db/development.sqlite3
-
-development:
-  <<: *default
   database: movieReviews
   username: postgres
   password: Snickers95

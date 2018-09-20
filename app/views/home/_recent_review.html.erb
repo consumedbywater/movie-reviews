@@ -1,0 +1,18 @@
+<div class="row">
+    <div class="col">
+        <p class="card-text mb-2 ml-1">
+            "<%= recent_review.comment %>"
+            <br />
+            <%= link_to recent_review.movie_title, movie_path(recent_review.movie_id), class: "text-white" %>
+        </p>
+    </div>
+    <div class="col ml-auto">
+        <% (1..5).each do |i| %>
+            <% if recent_review.rating >= i %>
+                <%= image_tag "star-filled.png", size: '20x20', class: "m-0 p-0 mb-2" %>
+            <% else %>
+                <%= image_tag "star-empty.png", size: '20x20', class: "m-0 p-0 mb-2" %>
+            <% end %>
+        <% end %>
+    </div>
+</div>
