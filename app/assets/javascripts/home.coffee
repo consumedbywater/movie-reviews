@@ -21,7 +21,6 @@ $(document).on "turbolinks:load", ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
             movieArray = movies.results
-            disableButtons()
             insertMovies movieArray, ->
                 enableButtons()
                 $('#title-button').addClass('disabled')
