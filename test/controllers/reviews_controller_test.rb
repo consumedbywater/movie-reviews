@@ -17,7 +17,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     end
    
     assert_redirected_to '/movies/1'
-    assert_equal "Your review was saved", flash[:notice]
+    assert_equal "Your review was saved", flash[:primary]
   end
 
   test "should create review with comment" do
@@ -26,7 +26,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     end
    
     assert_redirected_to '/movies/1'
-    assert_equal "Your review was saved", flash[:notice]
+    assert_equal "Your review was saved", flash[:primary]
   end
 
   test "shouldn't create review with missing fields" do
@@ -35,6 +35,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     end
    
     assert_redirected_to '/movies/1/Some%20Title/reviews/new'
-    assert_equal "There was a problem saving your review", flash[:notice]
+    assert_equal "There was a problem saving your review", flash[:warning]
   end
 end
