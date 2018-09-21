@@ -6,8 +6,8 @@ default: &default
 development:
   <<: *default
   database: movieReviews
-  username: postgres
-  password: Snickers95
+  username: username
+  password: password
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -15,11 +15,11 @@ development:
 test:
   <<: *default
   database: movieReviews
-  username: postgres
-  password: Snickers95
+  username: username
+  password: password
 
 production:
   <<: *default
   database: movieReviews
-  username: postgres
-  password: Snickers95
+  username: username
+  password: password
