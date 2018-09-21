@@ -1,7 +1,3 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
-
 genreArray = []
 
 $(document).on "turbolinks:load", ->
@@ -13,46 +9,52 @@ $(document).on "turbolinks:load", ->
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1').done (movies) ->
             movieArray = movies.results
             insertMovies movieArray, ->
-                enableButtons()
-                $('#popularity-button').addClass('disabled')
+                $('#popularity-button').prop('disabled', true)
 
     $('#title-button').on 'click', ->
+        $('.movie-control').prop('disabled', true);
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=original_title.desc&include_adult=false&include_video=false&page=1').done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
             movieArray = movies.results
             insertMovies movieArray, ->
-                enableButtons()
-                $('#title-button').addClass('disabled')
+                $('.movie-control').prop('disabled', false)
+                $('#title-button').prop('disabled', true)
+                $('#genre-select').hide()
 
     $('#release-button').on 'click', ->
+        $('.movie-control').prop('disabled', true);
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=release_date.desc&include_adult=false&include_video=false&page=1').done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
             movieArray = movies.results
             insertMovies movieArray, ->
-                enableButtons()
-                $('#release-button').addClass('disabled')
+                $('.movie-control').prop('disabled', false)
+                $('#release-button').prop('disabled', true)
+                $('#genre-select').hide()
 
     $('#genre-button').on 'click', ->
+        $('.movie-control').prop('disabled', true);
         genreNum = $('#genre-select').val()
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=' + genreNum).done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
             movieArray = movies.results
             insertMovies movieArray, ->
-                enableButtons()
-                $('#genre-button').addClass('disabled')
+                $('.movie-control').prop('disabled', false)
+                $('#genre-button').prop('disabled', true)
                 $('#genre-select').show()
 
     $('#popularity-button').on 'click', ->
+        $('.movie-control').prop('disabled', true)
         $.ajax(url: 'https://api.themoviedb.org/3/discover/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1').done (movies) ->
             $('#movie-cards').empty()
             $('#movie-cards').append('<div id="movie-list"></div>')
             movieArray = movies.results
             insertMovies movieArray, ->
-                enableButtons()
-                $('#popularity-button').addClass('disabled')
+                $('.movie-control').prop('disabled', false)
+                $('#popularity-button').prop('disabled', true)
+                $('#genre-select').hide()
 
     $('#genre-select').on 'change', ->
         genreNum = $('#genre-select').val()
@@ -62,13 +64,6 @@ $(document).on "turbolinks:load", ->
             movieArray = movies.results
             insertMovies movieArray, ->
 
-enableButtons = ->
-    $('#title-button').removeClass('disabled')
-    $('#release-button').removeClass('disabled')
-    $('#genre-button').removeClass('disabled')
-    $('#popularity-button').removeClass('disabled')
-    $('#genre-select').hide();
-
 insertMovies =(movieArray, cb) ->
     for movie in movieArray
         insertMovie(movie.title, movie.id, movie.poster_path, movie.genre_ids, movie.release_date)
@@ -77,6 +72,7 @@ insertMovies =(movieArray, cb) ->
 
 insertRating =(id) ->
     $.ajax(url: '/movies/' + id + '/rating').done (rating) ->
+        $('#rating-id-' + id).empty()
         for i in [1..5]
             if rating >= i
                 $('#rating-id-' + id).append('<img src="/assets/star-filled-7320ff66de798d37e18a026145a6975e61dc547f79df018dc31f42df25d36da4.png" alt="Star filled" width="30" height="30" />')
@@ -101,10 +97,10 @@ generateComment =(comment) ->
 insertReviews =(id, cb) ->
     $.ajax(url: '/movies/' + id + '/reviews').done (reviews) ->
         reviewArray = reviews.reviews
-
+        $('#review-section-' + id).empty()
 
         for review in reviewArray      
-            $('#review-section-' + id).before(
+            $('#review-section-' + id).append(
                 '<div class="row">' +
                     '<div class="col-4">' +
                         generateRating(review.rating) +

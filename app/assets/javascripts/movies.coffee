@@ -1,21 +1,23 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
-
+#Some global variables for genre population and page navigation
 genreArray = []
 currentPage = 0
 totalPages = 0
 search = ""
 
+#Execute this when the page is finished loading
 $(document).on "turbolinks:load", ->
     hideNavigation()
+
+    #Get genres from TMDB
     $.ajax(url: 'https://api.themoviedb.org/3/genre/movie/list?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US').done (genres) ->
         genreArray = genres.genres
 
+    #Enable clicking on different buttons
     $('#search-button').on 'click', ->
         clearMovies()
         search = encodeURI($('#search-field').val())
         currentPage = 1
+        #Get movies from TMDB
         $.ajax(url: 'https://api.themoviedb.org/3/search/movie?api_key=5905cc7f31ec80e913b752877bc11fa2&language=en-US&query=' + search + '&page=' + currentPage + '&include_adult=false').done (movies) ->
             totalPages = if 1000 < movies.total_pages then 1000 else movies.total_pages
             movieArray = movies.results
@@ -62,9 +64,11 @@ $(document).on "turbolinks:load", ->
             insertMoviesSearch movieArray, ->
                 setButtons()
 
+#Clear all search results
 clearMovies = ->
     $('#search-results').empty()
 
+#Show navigation buttons
 showNavigation = ->
     $('#first-button').show()
     $('#previous-button').show()
@@ -72,6 +76,7 @@ showNavigation = ->
     $('#next-button').show()
     $('#last-button').show()
 
+#Hide navigation buttons
 hideNavigation = ->
     $('#first-button').hide()
     $('#previous-button').hide()
@@ -79,43 +84,41 @@ hideNavigation = ->
     $('#next-button').hide()
     $('#last-button').hide()
 
-incrementPage = ->
-    $('#current-page').text(parseInt($('#current-page').text()) + 1)
-
-    
-decrementPage = ->
-    $('#current-page').text(parseInt($('#current-page').text()) - 1)
-
+#Set the navigation buttons to enabled/disabled as needed
 setButtons = ->
     if (currentPage <= 1)
-        $('#first-button').addClass('disabled')
-        $('#previous-button').addClass('disabled')
+        $('#first-button').prop('disabled', true)
+        $('#previous-button').prop('disabled', true)
     else
-        $('#first-button').removeClass('disabled')
-        $('#previous-button').removeClass('disabled')
+        $('#first-button').prop('disabled', false)
+        $('#previous-button').prop('disabled', false)
 
     if (totalPages <= currentPage)
-        $('#next-button').addClass('disabled')
-        $('#last-button').addClass('disabled')
+        $('#next-button').prop('disabled', true)
+        $('#last-button').prop('disabled', true)
     else
-        $('#next-button').removeClass('disabled')
-        $('#last-button').removeClass('disabled')
+        $('#next-button').prop('disabled', false)
+        $('#last-button').prop('disabled', false)
     $('#current-page').text(currentPage)
 
+#Loop through movie array and put movies on page
 insertMoviesSearch =(movieArray, cb) ->
     for movie in movieArray
         insertMovieSearch(movie.title, movie.id, movie.poster_path, movie.genre_ids, movie.release_date)
         insertRatingSearch(movie.id)
         insertReviewsSearch(movie.id, cb)
 
+#Find section for movie rating, get rating from DB, and insert into page
 insertRatingSearch =(id) ->
     $.ajax(url: '/movies/' + id + '/rating').done (rating) ->
+        $('#rating-search-id-' + id).empty()
         for i in [1..5]
             if rating >= i
                 $('#rating-search-id-' + id).append('<img src="/assets/star-filled-7320ff66de798d37e18a026145a6975e61dc547f79df018dc31f42df25d36da4.png" alt="Star filled" width="30" height="30" />')
             else
                 $('#rating-search-id-' + id).append('<img src="/assets/star-empty-e9301878ad41c600f8959fa49c8a9b7e1b37a7df7fa0e0253b71a36bc57faceb.png" alt="Star empty" width="30" height="30" />')
 
+#Generate an HTML string for a given rating
 generateRatingSearch =(rating) ->
     ratingString = ""
     for i in [1..5]
@@ -125,19 +128,21 @@ generateRatingSearch =(rating) ->
             ratingString = ratingString + '<img src="/assets/star-empty-e9301878ad41c600f8959fa49c8a9b7e1b37a7df7fa0e0253b71a36bc57faceb.png" alt="Star empty" width="20" height="20" />'
     return ratingString
 
+#Generate an HTML string for a given comment
 generateCommentSearch =(comment) ->
     if comment.length > 0
         return '"' + comment + '" - '
     else
         return ''
 
+#Find section for reviews, get reviews from DB, and insert into page
 insertReviewsSearch =(id, cb) ->
     $.ajax(url: '/movies/' + id + '/reviews').done (reviews) ->
         reviewArray = reviews.reviews
-
+        $('#review-search-section-' + id).empty()
 
         for review in reviewArray      
-            $('#review-search-section-' + id).before(
+            $('#review-search-section-' + id).append(
                 '<div class="row">' +
                     '<div class="col-4">' +
                         generateRatingSearch(review.rating) +
@@ -151,6 +156,7 @@ insertReviewsSearch =(id, cb) ->
                 '</div>')
         cb()
 
+#Insert movie HTML into page
 insertMovieSearch =(title, id, poster, genres, release) ->
     html = '<div class="card text-white bg-secondary mt-2">' +
              '<div class="row">' +
@@ -178,6 +184,7 @@ insertMovieSearch =(title, id, poster, genres, release) ->
         '</div>'
     $('#search-results').append(html)
 
+#Create an HTML string for a list of genres
 createGenreListSearch =(genres) ->
     genreList = ""
     for genreId in genres

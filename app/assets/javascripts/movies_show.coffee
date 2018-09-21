@@ -1,7 +1,3 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
-
 genreArray = []
 
 $(document).on "turbolinks:load", ->
@@ -16,6 +12,7 @@ insertMovieShowPage =(movie, cb) ->
     
 insertRatingShowPage =(id) ->
     $.ajax(url: '/movies/' + id + '/rating').done (rating) ->
+        $('#rating-show-id-' + id).empty()
         for i in [1..5]
             if rating >= i
                 $('#rating-show-id-' + id).append('<img src="/assets/star-filled-white-91ffa089f753e699bbcabe2ae0fe37efc2e352e927574fc76a4d1f8586b2b077.png" alt="Star filled white" width="30" height="30" />')

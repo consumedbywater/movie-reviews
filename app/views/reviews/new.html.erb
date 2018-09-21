@@ -1,18 +1,44 @@
-<h1>New Review</h1>
+<div class="row align-content-center justify-content-center">
+    <h1 class="text-muted">Write A Review</h1>
+</div>
+<div class="row align-content-center justify-content-center">
+    <h2 class="text-muted"><%= @movie_title %></h2>
+</div>
+<div class="form-group m-4">
 <%= form_for @review do |f| %>
     <p>
         <%= f.label :email %><br />
-        <%= f.text_field :email %><br />
+        <%= f.text_field :email, class: 'form-control' %><br />
     </p>
     <p>
         <%= f.label :comment %><br />
-        <%= f.text_area :comment %><br />
+        <%= f.text_area :comment, class: 'form-control' %><br />
     </p>
         <%= f.label :rating %><br />
-        <%= f.text_field :rating %><br />
+        <div class="form-check-inline">
+        <%= f.radio_button :rating, 1, :class => 'form-check-input' %>
+        <%= f.label :rating_1, "One Star", :class => 'form-check-label' %>
+        </div>
+        <div class="form-check-inline">
+        <%= f.radio_button :rating, 2, :class => 'form-check-input' %>
+        <%= f.label :rating_2, "Two Stars", :class => 'form-check-label' %>
+        </div>
+        <div class="form-check-inline">
+        <%= f.radio_button :rating, 3, :class => 'form-check-input' %>
+        <%= f.label :rating_3, "Three Stars", :class => 'form-check-label' %>
+        </div>
+        <div class="form-check-inline">
+        <%= f.radio_button :rating, 4, :class => 'form-check-input' %>
+        <%= f.label :rating_4, "Four Stars", :class => 'form-check-label' %>
+        </div>
+        <div class="form-check-inline">
+        <%= f.radio_button :rating, 5, :class => 'form-check-input' %>
+        <%= f.label :rating_5, "Five Stars", :class => 'form-check-label' %>
+        </div>
         <%= f.hidden_field :movie_id, :value => @movie_id %>
         <%= f.hidden_field :movie_title, :value => @movie_title %>
     <p>
-        <%= f.submit "Add Post" %>
+        <%= f.submit "Add Post", class: 'form-control btn-secondary' %>
     </p>
 <% end %>
+</div>

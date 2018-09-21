@@ -4,9 +4,11 @@ one:
   email: one@one.com
   rating: 5
   movie_id: 6
+  movie_title: Movie
 
 two:
   email: two@two.com
   rating: 3
   movie_id: 7
+  movie_title: Another Movie
   comment: This is a comment

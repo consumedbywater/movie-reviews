@@ -15,9 +15,12 @@
         <li class="nav-item navbar-text mr-2"><%= link_to_unless_current "Home", home_index_path %></li>
         <li class="nav-item navbar-text mr-2"><%= link_to_unless_current "Movies", movies_path %></li>
         <li class="nav-item navbar-text mr-2"><%= link_to_unless_current "Reviews", reviews_path %></li>
-        <li class="nav-item navbar-text"><%= link_to_unless_current "About", home_about_path %></li>
+        <li class="nav-item navbar-text"><%= link_to_unless_current "About", about_path %></li>
       </ul>
     </nav>
+    <% flash.each do |key, value| %>
+        <div class="alert alert-<%= key %>" role="alert"><%= value %></div>
+      <% end %>
     <%= yield %>
   </body>
 </html>
