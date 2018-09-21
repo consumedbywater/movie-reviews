@@ -18,17 +18,19 @@
         <li class="nav-item navbar-text"><%= link_to_unless_current "About", about_path %></li>
       </ul>
     </nav>
-        <div style="padding-top: 60px">
-    <% flash.each do |key, value| %>
-        <div class="alert alert-<%= key %>" role="alert"><%= value %></div>
+    <div style="padding-top: 60px">
+      <% flash.each do |key, value| %>
+        <div class="alert alert-<%= key %>" role="alert">
+          <%= value %>
+        </div>
       <% end %>
       <%= yield %>
     </div>
-  <nav class="navbar fixed-bottom navbar-dark bg-dark p-1">
-    <div class="ml-auto text-light" style="font-size: 14px">
-      <%= image_tag "tmdb.svg", size: '25x25', class: 'p-0 m-0' %>
-      This product uses the TMDb API but is not endorsed or certified by TMDb.
-    </div>
-  </nav>
+    <nav class="navbar fixed-bottom navbar-dark bg-dark p-1">
+      <div class="ml-auto text-light" style="font-size: 14px">
+        <%= image_tag "tmdb.svg", size: '25x25', class: 'p-0 m-0' %>
+        This product uses the TMDb API but is not endorsed or certified by TMDb.
+      </div>
+    </nav>
   </body>
 </html>
