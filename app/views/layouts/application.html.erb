@@ -18,7 +18,7 @@
         <li class="nav-item navbar-text"><%= link_to_unless_current "About", about_path %></li>
       </ul>
     </nav>
-    <div style="padding-top: 60px">
+    <div style="padding-top: 60px; padding-bottom: 50px">
       <% flash.each do |key, value| %>
         <div class="alert alert-<%= key %>" role="alert">
           <%= value %>
