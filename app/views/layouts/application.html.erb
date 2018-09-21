@@ -9,7 +9,7 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark">
       <div class="navbar-brand mr-auto">Movie Reviews</div>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item navbar-text mr-2"><%= link_to_unless_current "Home", home_index_path %></li>
@@ -21,6 +21,14 @@
     <% flash.each do |key, value| %>
         <div class="alert alert-<%= key %>" role="alert"><%= value %></div>
       <% end %>
-    <%= yield %>
+    <div style="padding-top: 60px">
+      <%= yield %>
+    </div>
+  <nav class="navbar fixed-bottom navbar-dark bg-dark p-1">
+    <div class="ml-auto text-light" style="font-size: 14px">
+      <%= image_tag "tmdb.svg", size: '25x25', class: 'p-0 m-0' %>
+      This product uses the TMDb API but is not endorsed or certified by TMDb.
+    </div>
+  </nav>
   </body>
 </html>
